@@ -92,4 +92,17 @@ public class CalculatorServiceTests
         // then
         actualResult.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData("//#\n2#5", 7)]
+    [InlineData("//,\n2,ff,100", 102)]
+    public void Add_ShouldSupport1CustomDelimiterOfASingleCharacter_WhenInputContainsACustomDelimiter(string input, double expectedResult)
+    {
+        // when
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
+
+        // then
+        actualResult.Should().Be(expectedResult);
+    }
 }

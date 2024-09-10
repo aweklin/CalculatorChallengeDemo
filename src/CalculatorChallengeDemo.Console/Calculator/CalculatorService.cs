@@ -8,6 +8,7 @@ internal sealed class CalculatorService : ICalculatorService
     private const char _comma = ',';
     private const double _validNumberThreashold = 1000;
     private static readonly char[] _allowedAlternativeDelimiters = new char[] { '\n' };
+    private static readonly char[] _invalidDelimiters = new char[] { ' ', '/', _comma };
 
     public IEnumerable<double> ConvertToDoubles(string value)
     {
@@ -51,11 +52,27 @@ internal sealed class CalculatorService : ICalculatorService
     {
         string result = input;
 
+        // allowed alternative delimiters
         foreach (var allowedCharacter in _allowedAlternativeDelimiters)
         {
             if (input.Contains(allowedCharacter, StringComparison.OrdinalIgnoreCase))
             {
                 result = input.Replace(allowedCharacter, _comma);
+            }
+        }
+
+        // custom delimiter of a single character
+        if (result.AsSpan().Trim().StartsWith("//"))
+        {
+            IEnumerable<char> customDelimiterCharacters = result
+                .Where(x => !char.IsDigit(x))
+                .Where(x => !_invalidDelimiters.Contains(x))
+                .Where(x => !_allowedAlternativeDelimiters.Contains(x))
+                .ToArray();
+            if (customDelimiterCharacters.Any())
+            {
+                char customDelimiterCharacter = customDelimiterCharacters.First();
+                result = result.Replace(customDelimiterCharacter, _comma);
             }
         }
 
