@@ -1,13 +1,15 @@
 using System.Buffers;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace CalculatorChallengeDemo.Console.Calculator;
 
 internal sealed class CalculatorService : ICalculatorService
 {
     private const char _comma = ',';
+    private const char _newLine = '\n';
     private const double _validNumberThreashold = 1000;
-    private static readonly char[] _allowedAlternativeDelimiters = new char[] { '\n' };
+    private static readonly char[] _allowedAlternativeDelimiters = new char[] { _newLine };
     private static readonly char[] _invalidDelimiters = new char[] { ' ', '/', '[', ']', _comma };
 
     public IEnumerable<double> ConvertToDoubles(string value)
@@ -61,18 +63,27 @@ internal sealed class CalculatorService : ICalculatorService
             }
         }
 
-        // custom delimiter of a single character
+        // custom delimiter character
         if (result.AsSpan().Trim().StartsWith("//"))
         {
+            // eliminate numbers surounded by alphabets
+            string pattern = @"(?<=[a-zA-Z])\d(?=[a-zA-Z])";
+            result = Regex.Replace(input, pattern, ",").Replace(_newLine, _comma);
+
             IEnumerable<char> customDelimiterCharacters = result
                 .Where(x => !char.IsDigit(x))
+                .Where(x => !((int)x >= 65 && (int)x <= 90))
+                .Where(x => !((int)x >= 97 && (int)x <= 112))
                 .Where(x => !_invalidDelimiters.Contains(x))
                 .Where(x => !_allowedAlternativeDelimiters.Contains(x))
+                .Distinct()
                 .ToArray();
             if (customDelimiterCharacters.Any())
             {
-                char customDelimiterCharacter = customDelimiterCharacters.First();
-                result = result.Replace(customDelimiterCharacter, _comma);
+                foreach (char customDelimiterCharacter in customDelimiterCharacters)
+                {
+                    result = result.Replace(customDelimiterCharacter, _comma);
+                }
             }
         }
 

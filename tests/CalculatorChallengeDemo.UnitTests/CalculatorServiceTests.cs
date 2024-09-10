@@ -117,4 +117,16 @@ public class CalculatorServiceTests
         // then
         actualResult.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData("//[*][!!][r9r]\n11r9r22*hh*33!!44", 110)]
+    public void Add_ShouldSupportMultipleCustomDelimiterOfAnyLength_WhenInputContainsACustomDelimiter(string input, double expectedResult)
+    {
+        // when
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
+
+        // then
+        actualResult.Should().Be(expectedResult);
+    }
 }
