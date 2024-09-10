@@ -105,4 +105,16 @@ public class CalculatorServiceTests
         // then
         actualResult.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData("//[***]\n11***22***33", 66)]
+    public void Add_ShouldSupport1CustomDelimiterOfAnyLength_WhenInputContainsACustomDelimiter(string input, double expectedResult)
+    {
+        // when
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
+
+        // then
+        actualResult.Should().Be(expectedResult);
+    }
 }
