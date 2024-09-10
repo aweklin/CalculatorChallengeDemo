@@ -1,31 +1,40 @@
+using System.Buffers;
 using System.Globalization;
 
 namespace CalculatorChallengeDemo.Console.Calculator;
 
 internal sealed class CalculatorService : ICalculatorService
 {
-    public (double Operator1, double Operator2) ConvertToDoubles(string value)
+    public IEnumerable<double> ConvertToDoubles(string value)
     {
         string[] valuesArray = value.Split(",");
-        if (valuesArray.Length > 2)
+
+        if (valuesArray.Length == 0)
         {
-            throw new InvalidOperationException();
+            return Enumerable.Empty<double>();
         }
 
-        switch (valuesArray.Length)
+        List<double> result = new();
+        foreach (var item in valuesArray)
         {
-            case 0:
-                return (Operator1: 0, Operator2: 0);
-            case 1:
-                return (Operator1: ParseDouble(valuesArray[0]), Operator2: 0);
-            default:
-                return (Operator1: ParseDouble(valuesArray[0]), Operator2: ParseDouble(valuesArray[1]));
+            if (string.IsNullOrWhiteSpace(item))
+            {
+                result.Add(0);
+                continue;
+            }
+
+            if (double.TryParse(item, out double number))
+            {
+                result.Add(number);
+            }
         }
+
+        return result;
     }
 
-    public double Add(double operator1, double operator2)
+    public double Add(IEnumerable<double> numbers)
     {
-        return operator1 + operator2;
+        return numbers.Sum();
     }
 
     private static double ParseDouble(string input)

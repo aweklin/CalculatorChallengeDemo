@@ -16,23 +16,6 @@ public class CalculatorServiceTests
         _calculatorService = new CalculatorService();
     }
 
-    [Fact]
-    public void ConvertToDoubles_ShouldThrowException_WhenInputIsMoreThan2Numbers()
-    {
-        // given
-        string input = "1,2,3";
-
-        // when
-        (double Operator1, double Operator2) ConvertToDoublesAction() =>
-            _calculatorService.ConvertToDoubles(input);
-
-        // then
-        FluentActions
-            .Invoking(ConvertToDoublesAction)
-            .Should()
-            .Throw<InvalidOperationException>();
-    }
-
     [Theory]
     [InlineData("", 0)]
     [InlineData("1,", 1)]
@@ -40,10 +23,25 @@ public class CalculatorServiceTests
     public void Add_ShouldReturnSummationOfTwoNumbers_WhenInputIsEmptyOrHasMissingNumbers(string input, double expectedResult)
     {
         // when
-        (double operator1, double operator2) = _calculatorService.ConvertToDoubles(input);
-        double actualResult = _calculatorService.Add(operator1, operator2);
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
 
         // then
         expectedResult.Should().Be(actualResult);
+    }
+
+    [Fact]
+    public void Add_ShouldReturnListOfNumbers_WhenInputHasOnlyNumbers()
+    {
+        // given
+        string input = "1,2,3,4,5,6,7,8,9,10,11,12";
+        double expectedResult = 78;
+
+        // when
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
+
+        // then
+        actualResult.Should().Be(expectedResult);
     }
 }
