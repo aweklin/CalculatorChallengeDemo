@@ -18,12 +18,24 @@ internal sealed class CalculatorService : ICalculatorService
         }
 
         List<double> result = new();
+        List<double> badNumbers = new();
         foreach (var item in valuesArray)
         {
-            if (double.TryParse(item, out double number))
+            if (double.TryParse(item, out double number) && number > 0)
             {
                 result.Add(number);
+                continue;
             }
+
+            if (number < 0)
+            {
+                badNumbers.Add(number);
+            }
+        }
+
+        if (badNumbers.Count > 0)
+        {
+            throw new ArithmeticException("No negative number is allowed. Found the following negative numbers: " + string.Join(',', badNumbers));
         }
 
         return result;

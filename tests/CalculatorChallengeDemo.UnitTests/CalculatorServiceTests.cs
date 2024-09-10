@@ -59,4 +59,22 @@ public class CalculatorServiceTests
         // then
         actualResult.Should().Be(expectedResult);
     }
+
+    [Fact]
+    public void ConvertToDoubles_ShouldThrowException_WhenInputContainsANegativeNumber()
+    {
+        // given
+        string input = "4,-3";
+        string expectedErrorMessage = "No negative number is allowed. Found the following negative numbers: -3";
+
+        // when
+        IEnumerable<double> ConvertToDoublesAction() => _calculatorService.ConvertToDoubles(input);
+
+        // then
+        FluentActions
+            .Invoking(ConvertToDoublesAction)
+            .Should()
+            .Throw<ArithmeticException>()
+            .WithMessage(expectedErrorMessage);
+    }
 }
