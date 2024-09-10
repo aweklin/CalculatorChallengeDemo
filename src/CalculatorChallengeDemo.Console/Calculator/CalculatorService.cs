@@ -5,9 +5,12 @@ namespace CalculatorChallengeDemo.Console.Calculator;
 
 internal sealed class CalculatorService : ICalculatorService
 {
+    private const char _comma = ',';
+    private static readonly char[] _allowedAlternativeDelimiters = new char[] { '\n' };
+
     public IEnumerable<double> ConvertToDoubles(string value)
     {
-        string[] valuesArray = value.Split(",");
+        string[] valuesArray = SplitInput(value);
 
         if (valuesArray.Length == 0)
         {
@@ -17,12 +20,6 @@ internal sealed class CalculatorService : ICalculatorService
         List<double> result = new();
         foreach (var item in valuesArray)
         {
-            if (string.IsNullOrWhiteSpace(item))
-            {
-                result.Add(0);
-                continue;
-            }
-
             if (double.TryParse(item, out double number))
             {
                 result.Add(number);
@@ -35,6 +32,21 @@ internal sealed class CalculatorService : ICalculatorService
     public double Add(IEnumerable<double> numbers)
     {
         return numbers.Sum();
+    }
+
+    private static string[] SplitInput(string input)
+    {
+        string result = input;
+
+        foreach (var allowedCharacter in _allowedAlternativeDelimiters)
+        {
+            if (input.Contains(allowedCharacter, StringComparison.OrdinalIgnoreCase))
+            {
+                result = input.Replace(allowedCharacter, _comma);
+            }
+        }
+
+        return result.Split(_comma);
     }
 
     private static double ParseDouble(string input)
