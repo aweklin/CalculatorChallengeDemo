@@ -32,4 +32,18 @@ public class CalculatorServiceTests
             .Should()
             .Throw<InvalidOperationException>();
     }
+
+    [Theory]
+    [InlineData("", 0)]
+    [InlineData("1,", 1)]
+    [InlineData(",", 0)]
+    public void Add_ShouldReturnSummationOfTwoNumbers_WhenInputIsEmptyOrHasMissingNumbers(string input, double expectedResult)
+    {
+        // when
+        (double operator1, double operator2) = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(operator1, operator2);
+
+        // then
+        expectedResult.Should().Be(actualResult);
+    }
 }
