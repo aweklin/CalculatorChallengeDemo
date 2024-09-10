@@ -6,6 +6,7 @@ namespace CalculatorChallengeDemo.Console.Calculator;
 internal sealed class CalculatorService : ICalculatorService
 {
     private const char _comma = ',';
+    private const double _validNumberThreashold = 1000;
     private static readonly char[] _allowedAlternativeDelimiters = new char[] { '\n' };
 
     public IEnumerable<double> ConvertToDoubles(string value)
@@ -43,7 +44,7 @@ internal sealed class CalculatorService : ICalculatorService
 
     public double Add(IEnumerable<double> numbers)
     {
-        return numbers.Sum();
+        return numbers.Where(x => x < _validNumberThreashold).Sum();
     }
 
     private static string[] SplitInput(string input)

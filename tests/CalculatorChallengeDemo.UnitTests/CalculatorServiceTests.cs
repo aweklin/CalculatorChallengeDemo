@@ -77,4 +77,19 @@ public class CalculatorServiceTests
             .Throw<ArithmeticException>()
             .WithMessage(expectedErrorMessage);
     }
+
+    [Fact]
+    public void Add_ShouldMakeAnyValueGreaterThan1000InvalidAndSumTheRest_WhenInputContainsANumberGreaterThan1000()
+    {
+        // given
+        string input = "2,1001,6";
+        double expectedResult = 8;
+
+        // when
+        IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
+        double actualResult = _calculatorService.Add(numbers);
+
+        // then
+        actualResult.Should().Be(expectedResult);
+    }
 }
