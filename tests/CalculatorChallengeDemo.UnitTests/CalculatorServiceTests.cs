@@ -30,13 +30,11 @@ public class CalculatorServiceTests
         expectedResult.Should().Be(actualResult);
     }
 
-    [Fact]
-    public void Add_ShouldReturnSummationOfTwoNumbers_WhenInputHasOnlyNumbers()
+    [Theory]
+    [InlineData("101,9000", 101)]
+    [InlineData("1,2,3,4,5,6,7,8,9,10,11,12", 78)]
+    public void Add_ShouldReturnSummationOfTwoNumbers_WhenInputHasOnlyNumbers(string input, double expectedResult)
     {
-        // given
-        string input = "1,2,3,4,5,6,7,8,9,10,11,12";
-        double expectedResult = 78;
-
         // when
         IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
         double actualResult = _calculatorService.Add(numbers);
@@ -78,13 +76,11 @@ public class CalculatorServiceTests
             .WithMessage(expectedErrorMessage);
     }
 
-    [Fact]
-    public void Add_ShouldMakeAnyValueGreaterThan1000InvalidAndSumTheRest_WhenInputContainsANumberGreaterThan1000()
+    [Theory]
+    [InlineData("2,1001,6", 8)]
+    [InlineData("2,,4,rrrr,1001,6", 12)]
+    public void Add_ShouldMakeAnyValueGreaterThan1000InvalidAndSumTheRest_WhenInputContainsANumberGreaterThan1000(string input, double expectedResult)
     {
-        // given
-        string input = "2,1001,6";
-        double expectedResult = 8;
-
         // when
         IEnumerable<double> numbers = _calculatorService.ConvertToDoubles(input);
         double actualResult = _calculatorService.Add(numbers);
@@ -94,6 +90,7 @@ public class CalculatorServiceTests
     }
 
     [Theory]
+    [InlineData("12,#6", 18)]
     [InlineData("//#\n2#5", 7)]
     [InlineData("//,\n2,ff,100", 102)]
     public void Add_ShouldSupport1CustomDelimiterOfASingleCharacter_WhenInputContainsACustomDelimiter(string input, double expectedResult)

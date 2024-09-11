@@ -8,9 +8,13 @@ internal sealed class CalculatorService : ICalculatorService
 {
     private const char _comma = ',';
     private const char _newLine = '\n';
-    private const double _validNumberThreashold = 1000;
+    private const double _validNumberThreshold = 1001;
     private static readonly char[] _allowedAlternativeDelimiters = new char[] { _newLine };
-    private static readonly char[] _invalidDelimiters = new char[] { ' ', '/', '[', ']', _comma };
+
+    public double Add(IEnumerable<double> numbers)
+    {
+        return numbers.Where(x => x < _validNumberThreshold).Sum();
+    }
 
     public IEnumerable<double> ConvertToDoubles(string value)
     {
@@ -45,11 +49,6 @@ internal sealed class CalculatorService : ICalculatorService
         return result;
     }
 
-    public double Add(IEnumerable<double> numbers)
-    {
-        return numbers.Where(x => x < _validNumberThreashold).Sum();
-    }
-
     private static string[] SplitInput(string input)
     {
         string result = input;
@@ -63,40 +62,28 @@ internal sealed class CalculatorService : ICalculatorService
             }
         }
 
-        // custom delimiter character
-        if (result.AsSpan().Trim().StartsWith("//"))
-        {
-            // eliminate numbers surounded by alphabets
-            string pattern = @"(?<=[a-zA-Z])\d(?=[a-zA-Z])";
-            result = Regex.Replace(input, pattern, ",").Replace(_newLine, _comma);
+        // ======== custom delimiter character ======
 
-            IEnumerable<char> customDelimiterCharacters = result
-                .Where(x => !char.IsDigit(x))
-                .Where(x => !((int)x >= 65 && (int)x <= 90))
-                .Where(x => !((int)x >= 97 && (int)x <= 112))
-                .Where(x => !_invalidDelimiters.Contains(x))
-                .Where(x => !_allowedAlternativeDelimiters.Contains(x))
-                .Distinct()
-                .ToArray();
-            if (customDelimiterCharacters.Any())
+        // eliminate numbers surrounded by alphabets
+        string pattern = @"(?<=[a-zA-Z])\d(?=[a-zA-Z])";
+        result = Regex.Replace(input, pattern, ",").Replace(_newLine, _comma);
+
+        // allow custom delimiters
+        IEnumerable<char> customDelimiterCharacters = result
+            .Where(x => !char.IsDigit(x))
+            .Where(x => x != '-')
+            .Where(x => x != ',')
+            .Where(x => !_allowedAlternativeDelimiters.Contains(x))
+            .Distinct()
+            .ToArray();
+        if (customDelimiterCharacters.Any())
+        {
+            foreach (char customDelimiterCharacter in customDelimiterCharacters)
             {
-                foreach (char customDelimiterCharacter in customDelimiterCharacters)
-                {
-                    result = result.Replace(customDelimiterCharacter, _comma);
-                }
+                result = result.Replace(customDelimiterCharacter, _comma);
             }
         }
 
         return result.Split(_comma);
-    }
-
-    private static double ParseDouble(string input)
-    {
-        if (double.TryParse(input, out double result))
-        {
-            return result;
-        }
-
-        return 0;
     }
 }
